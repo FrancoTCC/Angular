@@ -1,0 +1,132 @@
+<h3>
+    Administración de categorías
+    <button class="addBtn" (click)="addCategory()">Agregar categoría</button>
+</h3>
+<div>
+    @if(showFormCategory != 'none') {
+        <section>
+            <h4> Agregar Categoría</h4>
+            <form [formGroup]="formCategory" (submit)="createCategory()">
+                <div>
+                    <label for="categoryId">ID de Categoría (opcional)</label>
+                    <input type="text" formControlName="categoryId" />
+                    <div class="error">
+                        @if(!formCategory.pristine && formCategory.controls['categoryId'].errors) {
+                            @if(formCategory.controls['categoryId'].errors['pattern']){
+                                <span>Este campo debe ser un número válido</span>
+                            }
+                        }
+                    </div>
+                </div>
+                <div>
+                    <label for="name">Nombre</label>
+                    <input type="text" formControlName="name" />
+                    <div class="error">
+                        @if(!formCategory.pristine && formCategory.controls['name'].errors) {
+                            @if(formCategory.controls['name'].errors['required']){
+                                <span>Este campo es requerido</span>
+                            }
+                            @if(formCategory.controls['name'].errors['minlength']){
+                                <span>La cantidad de letras mínimas para una
+                                    categoría es {{formCategory.controls['name'].errors['minlength']['requiredLength']}}
+                                    (actualmente tiene: {{formCategory.controls['name'].errors['minlength']['actualLength']}} caracteres)
+                                </span>
+                            }
+                            @if(formCategory.controls['name'].errors['maxlength']){
+                                <span>La cantidad de letras máximas para una
+                                    categoría es {{formCategory.controls['name'].errors['maxlength']['requiredLength']}}
+                                    (actualmente tiene: {{formCategory.controls['name'].errors['maxlength']['actualLength']}} caracteres)
+                                </span>
+                            }
+                        }
+                    </div>
+                </div>
+                <div>
+                    <label for="description">Descripción</label>
+                    <textarea formControlName="description"></textarea>
+                    <div class="error">
+                        @if(!formCategory.pristine && formCategory.controls['description'].errors) {
+                            @if(formCategory.controls['description'].errors['required']){
+                                <span>Este campo es requerido</span>
+                            }
+                            @if(formCategory.controls['description'].errors['minlength']){
+                                <span>La cantidad de letras mínimas para una
+                                    categoría es {{formCategory.controls['description'].errors['minlength']['requiredLength']}}
+                                    (actualmente tiene: {{formCategory.controls['description'].errors['minlength']['actualLength']}} caracteres)
+                                </span>
+                            }
+                            @if(formCategory.controls['description'].errors['maxlength']){
+                                <span>La cantidad de letras máximas para una
+                                    categoría es {{formCategory.controls['description'].errors['maxlength']['requiredLength']}}
+                                    (actualmente tiene: {{formCategory.controls['description'].errors['maxlength']['actualLength']}} caracteres)
+                                </span>
+                            }
+                        }
+                    </div>
+                </div>
+                <div>
+                    <button (click)="showFormCategory = 'none'">Cancelar</button>
+                    <button type="submit" [disabled]="!formCategory.valid">Agregar</button>
+                </div>
+            </form>
+        </section>
+    }
+</div>
+
+<div>
+    @switch(cargaDatos) {
+        @case ('none') {
+
+        }
+        @case ('loading') {
+            <p>Estamos preparándonos para que todo funcione
+                <br>
+                por favor espere unos segundos.
+            </p>
+        }
+        @case ('done') {
+            <br><br>
+            <table class="table-data">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ID de Categoría</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(category of categories; track $index) {
+                        <tr>
+                            <td>{{category.id}}</td>
+                            <td>{{category.categoryId !== null ? category.categoryId : 'No hay ID'}}</td>
+                            <td>{{category.name}}</td>
+                            <td>{{category.description}}</td>
+                            <td>{{category.state ? 'Activado' : 'Desactivado'}}</td>
+                            <td>
+                                @if(category.remove) {
+                                    <span>¿Está seguro de eliminar esta categoría?</span>
+                                    <div>
+                                        <button class="okBtn" (click)="confirmDelete(category.id)">Sí</button>
+                                        <button class="CancelBtn" (click)="cancelDelete(category)">No</button>
+                                    </div>
+                                } @else {
+                                    <button class="editBtn">Editar</button>
+                                    <button class="remBtn" (click)="removeCategory(category)">Eliminar</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        @case ('error') {
+            <p>
+                Lo sentimos, tuvimos un error.
+                por favor inténtelo en unos minutos.
+            </p>
+        }
+    }
+</div>
